@@ -30,7 +30,7 @@ FITUR.md
 user.txt
 
 # SQLite database file
-backend/database.db
+backend/prisma/database.db
 
 # Inno Setup output & bundled Node.js installer
 Output/
