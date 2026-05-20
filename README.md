@@ -132,16 +132,34 @@ Menu utama untuk mencatat hasil penimbangan dan pengukuran setiap bulan.
 
 **Cara mengisi pengukuran:**
 1. Pilih bulan dan tahun di pojok kanan atas
-2. Tabel menampilkan semua balita aktif yang belum berusia 5 tahun
-3. Isi kolom **Berat (kg)**, **Tinggi (cm)**, **LL (cm)**, **LK (cm)**, dan **Catatan** per baris anak
-4. Klik tombol **Simpan** di ujung kanan baris untuk menyimpan data anak tersebut
-5. Ulangi untuk setiap anak
+2. Tabel menampilkan semua balita yang masih aktif pada bulan tersebut
+3. Isi kolom **Berat (kg)**, **Tinggi (cm)**, **LL (cm)**, **LK (cm)** per baris anak
+4. Kolom **NTOB** otomatis terisi berdasarkan perbandingan dengan bulan sebelumnya — bisa diubah manual via dropdown jika perlu
+5. Klik tombol **Simpan** di ujung kanan baris untuk menyimpan data anak tersebut
+6. Ulangi untuk setiap anak
+
+**Keterangan kolom:**
+| Kolom | Keterangan |
+|---|---|
+| BL/PB | Berat Lahir (kg) / Panjang Lahir (cm) — diambil dari data anak |
+| BB | Berat Badan bulan ini (kg) |
+| TB | Tinggi Badan bulan ini (cm) |
+| LL | Lingkar Lengan (cm) |
+| LK | Lingkar Kepala (cm) |
+| NTOB | Status penimbangan — lihat keterangan di bawah |
+
+**Keterangan NTOB:**
+- **N** — Naik (berat bertambah dari bulan lalu)
+- **T** — Turun atau Tetap (berat sama atau berkurang)
+- **O** — Bulan lalu tidak timbang
+- **B** — Bayi Baru (penimbangan pertama kali)
 
 **Catatan:**
 - Anak diurutkan berdasarkan **tanggal lahir** (tertua di atas), sesuai urutan buku timbang
-- Anak yang sudah **genap 5 tahun hari ini** otomatis tidak muncul
-- Filter usia berjalan **real-time** berdasarkan tanggal hari ini, tidak perlu input manual
+- Anak tetap muncul di **bulan ulang tahunnya yang ke-5** sebagai penimbangan terakhir, lalu tidak muncul lagi bulan berikutnya
+- Jika membuka bulan-bulan lalu, anak yang sudah masuk arsip tetap muncul sesuai kondisi saat itu
 - Jika data bulan itu sudah ada, simpan ulang akan **memperbarui** data (tidak dobel)
+- Klik **Print Buku Timbang** untuk mencetak format sesuai buku timbang asli
 
 ---
 
@@ -155,8 +173,13 @@ Daftar anak yang saat ini **berusia di bawah 5 tahun**.
 **Menambah anak secara manual:**
 1. Klik tombol **+ Tambah Anak**
 2. Isi form: Nama Lengkap, NIK (opsional), Tanggal Lahir, Jenis Kelamin, Nama Orang Tua
-3. NIK boleh dikosongkan jika belum keluar dari pemerintah daerah, bisa diisi nanti
-4. Klik **Simpan**
+3. Isi **Berat Lahir** dan **Panjang Lahir** jika tersedia — akan ditampilkan di kolom BL/PB pada tabel pengukuran
+4. NIK boleh dikosongkan jika belum keluar dari pemerintah daerah, bisa diisi nanti melalui tombol **Edit**
+5. Klik **Simpan**
+
+**Mengedit data anak:**
+- Klik tombol **Edit** pada baris anak yang ingin diubah
+- Semua field bisa diperbarui termasuk berat lahir dan panjang lahir
 
 **Import data dari Excel (untuk data massal):**
 1. Klik **Download Template** untuk mengunduh file Excel template
@@ -178,7 +201,7 @@ Daftar anak yang sudah **berusia 5 tahun ke atas**. Perpindahan ke arsip terjadi
 Klik **Detail →** pada baris anak untuk melihat halaman detail.
 
 Berisi:
-- **Informasi pribadi** — NIK, jenis kelamin, tanggal lahir, usia otomatis, nama orang tua
+- **Informasi pribadi** — NIK, jenis kelamin, tanggal lahir, usia otomatis, nama orang tua, berat lahir, panjang lahir
 - **Grafik pertumbuhan** — berat dan tinggi per bulan dalam bentuk line chart
 - **Status imunisasi** — 11 jenis vaksin (HB, BCG, DPT 1-3, IPV, Campak, Polio 1-4)
   - Klik tombol vaksin untuk toggle **sudah / belum diberikan**
@@ -203,16 +226,28 @@ Untuk mencatat kegiatan posyandu dan peserta yang hadir (kader, orang tua, dll.)
 3. Klik **+ Tambah** untuk menambahkan ke daftar
 4. Ulangi untuk setiap peserta
 
+**Menghapus data:**
+- Klik **Hapus** pada baris peserta untuk menghapus satu peserta dari daftar hadir
+- Klik **Hapus kegiatan** di bawah nama kegiatan untuk menghapus kegiatan beserta seluruh daftar hadirnya
+
+Klik **Print Daftar Hadir** untuk mencetak format sesuai dokumen asli (minimal 20 baris).
+
 ---
 
 ### Manajemen Pengguna (Khusus Admin)
 
 Hanya dapat diakses oleh pengguna dengan role **Admin**.
 
-**Menambah pengguna baru (Kader):**
+**Menambah pengguna baru:**
 1. Klik **+ Tambah Pengguna**
-2. Isi nama lengkap, username, password, dan pilih role
+2. Isi nama lengkap, username, password, dan pilih role (Admin / Kader)
 3. Klik **Simpan**
+
+**Mengedit pengguna:**
+1. Klik **Edit** pada baris pengguna
+2. Ubah nama, username, atau role sesuai kebutuhan
+3. Isi password baru jika ingin menggantinya — **kosongkan jika tidak ingin diubah**
+4. Klik **Simpan**
 
 **Menonaktifkan pengguna:**
 - Klik **Nonaktifkan** pada baris pengguna yang ingin dinonaktifkan
@@ -231,7 +266,7 @@ Hanya dapat diakses oleh pengguna dengan role **Admin**.
 | Login | ✓ | ✓ |
 | Dashboard | ✓ | ✓ |
 | Input pengukuran | ✓ | ✓ |
-| Tambah / import anak | ✓ | ✓ |
+| Tambah / edit / import anak | ✓ | ✓ |
 | Lihat detail anak | ✓ | ✓ |
 | Kelola kegiatan & hadir | ✓ | ✓ |
 | Manajemen pengguna | ✓ | ✗ |
