@@ -36,7 +36,4 @@ backend/database.db
 Output/
 *.msi
 
-# Icon folder
-Icon/
-
 .claude/
