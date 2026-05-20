@@ -9,6 +9,7 @@ export default function KegiatanPage() {
   const [hadir, setHadir] = useState([])
   const [form, setForm] = useState({ judul: '', tanggal: '', jam: '', tempat: '', keterangan: '' })
   const [hadirForm, setHadirForm] = useState({ nama: '', alamat: '', keterangan: '' })
+  const [formatPrint, setFormatPrint] = useState('ttd') // 'ttd' | 'checklist'
 
   const load = () => api.get('/kegiatan').then(r => setKegiatan(r.data))
 
@@ -45,6 +46,11 @@ export default function KegiatanPage() {
     load()
   }
 
+  const handleToggleHadir = async (hadirId) => {
+    await api.patch(`/kegiatan/hadir/${hadirId}/toggle`)
+    loadHadir(selected.id)
+  }
+
   const handleDeleteHadir = async (hadirId) => {
     if (!confirm('Hapus peserta ini dari daftar hadir?')) return
     await api.delete(`/kegiatan/hadir/${hadirId}`)
@@ -52,25 +58,30 @@ export default function KegiatanPage() {
     load()
   }
 
-  const handlePrintHadir = () => {
+  const handlePrintHadir = (fmt) => {
+    const isChecklist = fmt === 'checklist'
     const tgl = new Date(selected.tanggal).toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' })
+
     const rows = hadir.map((h, i) => `
       <tr>
         <td class="center">${i + 1}</td>
         <td>${h.nama}</td>
         <td>${h.alamat ?? ''}</td>
-        <td class="ttd"></td>
+        <td class="center ttd">${isChecklist ? (h.hadir ? '☑' : '☐') : ''}</td>
         <td>${h.keterangan ?? ''}</td>
       </tr>`
     ).join('')
 
-    // Tambah baris kosong hingga minimal 20
     const extraRows = Math.max(0, 20 - hadir.length)
     const emptyRows = Array(extraRows).fill(`
       <tr>
-        <td class="center">&nbsp;</td><td></td><td></td><td class="ttd"></td><td></td>
+        <td class="center">&nbsp;</td><td></td><td></td>
+        <td class="center ttd">${isChecklist ? '☐' : ''}</td>
+        <td></td>
       </tr>`
     ).join('')
+
+    const kolomKe4 = isChecklist ? 'HADIR' : 'TANDA TANGAN'
 
     printWindow(`Daftar Hadir — ${selected.judul}`, `
       <h2>DAFTAR HADIR KEGIATAN POSYANDU</h2>
@@ -100,7 +111,7 @@ export default function KegiatanPage() {
             <th style="width:30px">NO</th>
             <th>NAMA</th>
             <th>ALAMAT</th>
-            <th style="width:100px">TANDA TANGAN</th>
+            <th style="width:${isChecklist ? '50px' : '100px'}">${kolomKe4}</th>
             <th style="width:80px">KET</th>
           </tr>
         </thead>
@@ -154,12 +165,20 @@ export default function KegiatanPage() {
           <div className="bg-white rounded-xl shadow p-4 lg:col-span-2">
             <div className="flex items-center justify-between mb-1">
               <h2 className="font-semibold text-gray-700">{selected.judul}</h2>
-              <button
-                onClick={handlePrintHadir}
-                className="border border-gray-400 text-gray-600 px-3 py-1.5 rounded-lg hover:bg-gray-50 text-xs font-medium"
-              >
-                🖨️ Print Daftar Hadir
-              </button>
+              <div className="flex items-center gap-1">
+                <button
+                  onClick={() => handlePrintHadir('ttd')}
+                  className="border border-gray-400 text-gray-600 px-3 py-1.5 rounded-lg hover:bg-gray-50 text-xs font-medium"
+                >
+                  🖨️ TTD
+                </button>
+                <button
+                  onClick={() => handlePrintHadir('checklist')}
+                  className="border border-gray-400 text-gray-600 px-3 py-1.5 rounded-lg hover:bg-gray-50 text-xs font-medium"
+                >
+                  🖨️ Checklist
+                </button>
+              </div>
             </div>
             <p className="text-xs text-gray-500 mb-4">
               {new Date(selected.tanggal).toLocaleDateString('id-ID')}
@@ -173,6 +192,8 @@ export default function KegiatanPage() {
                 placeholder="Nama peserta" className="border rounded-lg px-3 py-2 text-sm flex-1 min-w-32" />
               <input value={hadirForm.alamat} onChange={e => setHadirForm({...hadirForm, alamat: e.target.value})}
                 placeholder="Alamat" className="border rounded-lg px-3 py-2 text-sm flex-1 min-w-32" />
+              <input value={hadirForm.keterangan} onChange={e => setHadirForm({...hadirForm, keterangan: e.target.value})}
+                placeholder="Keterangan (opsional)" className="border rounded-lg px-3 py-2 text-sm flex-1 min-w-32" />
               <button type="submit" className="bg-green-700 text-white px-4 py-2 rounded-lg text-sm hover:bg-green-800">
                 + Tambah
               </button>
@@ -186,6 +207,7 @@ export default function KegiatanPage() {
                   <th className="px-3 py-2 text-left">Nama</th>
                   <th className="px-3 py-2 text-left">Alamat</th>
                   <th className="px-3 py-2 text-left">Keterangan</th>
+                  <th className="px-3 py-2 text-center">Hadir</th>
                   <th className="px-3 py-2"></th>
                 </tr>
               </thead>
@@ -196,6 +218,14 @@ export default function KegiatanPage() {
                     <td className="px-3 py-2 font-medium">{h.nama}</td>
                     <td className="px-3 py-2 text-gray-500">{h.alamat ?? '-'}</td>
                     <td className="px-3 py-2 text-gray-500">{h.keterangan ?? '-'}</td>
+                    <td className="px-3 py-2 text-center">
+                      <input
+                        type="checkbox"
+                        checked={h.hadir}
+                        onChange={() => handleToggleHadir(h.id)}
+                        className="w-4 h-4 accent-green-600 cursor-pointer"
+                      />
+                    </td>
                     <td className="px-3 py-2 text-right">
                       <button
                         onClick={() => handleDeleteHadir(h.id)}
@@ -234,9 +264,9 @@ export default function KegiatanPage() {
                       className="w-full border rounded-lg px-3 py-2 text-sm mt-1" />
                   </div>
                   <div>
-                    <label className="text-sm font-medium text-gray-700">Jam</label>
-                    <input value={form.jam} onChange={e => setForm({...form, jam: e.target.value})}
-                      placeholder="08:00 - 11:00" className="w-full border rounded-lg px-3 py-2 text-sm mt-1" />
+                    <label className="text-sm font-medium text-gray-700">Jam Mulai</label>
+                    <input type="time" value={form.jam} onChange={e => setForm({...form, jam: e.target.value})}
+                      className="w-full border rounded-lg px-3 py-2 text-sm mt-1" />
                   </div>
                 </div>
                 <div>

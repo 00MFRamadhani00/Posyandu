@@ -97,7 +97,6 @@ export default function PengukuranPage() {
           <td class="center">${p.lingkarKepala ?? ''}</td>
           <td class="center">${p.lingkarLengan ?? ''}</td>
           <td class="center"><b>${ntob}</b></td>
-          <td>${p.catatan ?? ''}</td>
         </tr>`
     }).join('')
 
@@ -117,7 +116,6 @@ export default function PengukuranPage() {
             <th style="width:50px">LK (cm)</th>
             <th style="width:50px">LL (cm)</th>
             <th style="width:45px">NTOB</th>
-            <th>CATATAN</th>
           </tr>
         </thead>
         <tbody>${rows}</tbody>

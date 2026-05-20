@@ -91,6 +91,7 @@ model DaftarHadir {
   nama       String
   alamat     String?
   keterangan String?
+  hadir      Boolean  @default(true)
   createdAt  DateTime @default(now())
   kegiatan   Kegiatan @relation(fields: [kegiatanId], references: [id])
 }

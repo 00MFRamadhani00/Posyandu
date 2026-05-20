@@ -33,6 +33,15 @@ router.post('/:id/hadir', authenticate, async (req, res) => {
   res.json(hadir);
 });
 
+router.patch('/hadir/:hadirId/toggle', authenticate, async (req, res) => {
+  const current = await prisma.daftarHadir.findUnique({ where: { id: parseInt(req.params.hadirId) } });
+  const updated = await prisma.daftarHadir.update({
+    where: { id: parseInt(req.params.hadirId) },
+    data: { hadir: !current.hadir }
+  });
+  res.json(updated);
+});
+
 router.delete('/hadir/:hadirId', authenticate, async (req, res) => {
   await prisma.daftarHadir.delete({ where: { id: parseInt(req.params.hadirId) } });
   res.json({ message: 'Peserta dihapus' });
