@@ -2,6 +2,8 @@
 
 Aplikasi web untuk mengelola data posyandu secara digital, menggantikan pencatatan manual di buku registrasi, buku timbang, dan daftar hadir.
 
+> **Versi ini menggunakan SQLite** — tidak memerlukan XAMPP atau MySQL. Database tersimpan langsung di dalam folder aplikasi.
+
 ---
 
 ## Daftar Isi
@@ -23,37 +25,29 @@ Aplikasi web untuk mengelola data posyandu secara digital, menggantikan pencatat
 
 ## Instalasi & Menjalankan Aplikasi
 
-### Prasyarat
-- [Node.js](https://nodejs.org) versi 18 ke atas
-- [XAMPP](https://www.apachefriends.org) (untuk MySQL)
+### Cara Termudah — Installer (Direkomendasikan)
 
----
+> Cocok untuk pengguna yang tidak terbiasa dengan terminal atau instalasi manual.
 
-### Cara Mudah (Double-click, tanpa terminal)
-
-> Cara ini direkomendasikan untuk pengguna sehari-hari.
-
-**Pertama kali (sekali saja):**
-1. Pastikan XAMPP sudah terinstall dan MySQL sudah pernah dijalankan minimal sekali
-2. Double-click file **`Setup Pertama Kali.bat`**
-3. Tunggu hingga selesai — proses ini menginstall semua kebutuhan, membuat database, dan membuat akun admin
+1. Jalankan file **`Setup Posyandu.exe`**
+2. Klik **Next → Install** dan tunggu hingga selesai
+   - Jika Node.js belum terinstall, akan diinstall otomatis
+   - Akan muncul jendela hitam yang menampilkan proses setup — tunggu sampai selesai lalu tekan sembarang tombol
+3. Selesai — shortcut **Posyandu App** muncul di Desktop
 
 **Setiap hari:**
-1. Double-click file **`Jalankan Posyandu.bat`**
-2. Browser akan terbuka otomatis menuju aplikasi
+1. Double-click shortcut **Posyandu App** di Desktop
+2. Browser akan terbuka otomatis
 3. Selesai menggunakan → tekan tombol apa saja di jendela hitam → aplikasi mati
-
-**Shortcut di desktop (opsional):**
-- Klik kanan `Jalankan Posyandu.bat` → *Send to* → *Desktop (create shortcut)*
 
 ---
 
-### Cara Manual (untuk developer)
+### Cara Manual (tanpa installer)
 
-**Pertama kali:**
+**Prasyarat:** [Node.js](https://nodejs.org) versi 18 ke atas
+
+**Pertama kali (sekali saja):**
 ```bash
-# Jalankan MySQL via XAMPP terlebih dahulu
-
 cd backend
 npm install
 npx prisma db push
@@ -64,19 +58,22 @@ npm install
 npm run build
 ```
 
+Atau double-click **`Setup Pertama Kali.bat`**.
+
 **Setiap hari:**
+
+Double-click **`Jalankan Posyandu.bat`**, atau:
 ```bash
 cd backend
 node src/index.js
 ```
 
-Buka browser dan akses: **URL Yang Anda Set**
-
-> Untuk mode pengembangan (dengan hot reload), jalankan `npm run dev` di folder `backend` dan `frontend` secara terpisah, lalu akses **URL ANDA**
+Buka browser: `http://localhost:3001`
 
 ---
 
 ### Login Default (Pertama Kali)
+
 | Username | Password | Role |
 |---|---|---|
 | `admin` | `admin123` | Admin |
@@ -103,7 +100,7 @@ Dapat diakses siapa saja tanpa login
 
 ### Login
 
-Akses halaman admin melalui tombol **Login Admin** di halaman publik, atau langsung ke **URL ANDA/login**
+Akses halaman admin melalui tombol **Login Admin** di halaman publik, atau langsung ke `/login`
 
 - Masukkan username dan password
 - Sesi aktif selama **8 jam**, setelah itu otomatis keluar
@@ -217,20 +214,22 @@ Untuk mencatat kegiatan posyandu dan peserta yang hadir (kader, orang tua, dll.)
 
 **Membuat kegiatan baru:**
 1. Klik **+ Tambah Kegiatan**
-2. Isi judul, tanggal, jam, dan tempat
+2. Isi judul, tanggal, jam mulai, dan tempat
 3. Klik **Simpan**
 
 **Mencatat daftar hadir:**
 1. Klik salah satu kegiatan di panel kiri
-2. Isi nama peserta dan alamat di form yang muncul
+2. Isi nama peserta, alamat, dan keterangan (opsional) di form yang muncul
 3. Klik **+ Tambah** untuk menambahkan ke daftar
-4. Ulangi untuk setiap peserta
+4. Centang kolom **Hadir** pada baris peserta untuk menandai kehadiran
 
 **Menghapus data:**
 - Klik **Hapus** pada baris peserta untuk menghapus satu peserta dari daftar hadir
 - Klik **Hapus kegiatan** di bawah nama kegiatan untuk menghapus kegiatan beserta seluruh daftar hadirnya
 
-Klik **Print Daftar Hadir** untuk mencetak format sesuai dokumen asli (minimal 20 baris).
+**Mencetak daftar hadir:**
+- **Print TTD** — kolom tanda tangan kosong untuk ditandatangani saat acara
+- **Print Checklist** — kolom centang otomatis berdasarkan status hadir yang sudah diinput
 
 ---
 
@@ -276,5 +275,6 @@ Hanya dapat diakses oleh pengguna dengan role **Admin**.
 ## Catatan Teknis
 
 - Aplikasi berjalan **lokal** di komputer posyandu, tidak memerlukan koneksi internet
-- Data tersimpan di database MySQL melalui XAMPP
+- Database menggunakan **SQLite** — tersimpan di `backend/prisma/database.db`, tidak perlu server database terpisah
 - Filter usia 5 tahun berjalan otomatis berdasarkan tanggal sistem komputer — pastikan **tanggal & waktu komputer selalu tepat**
+- **Backup data:** cukup salin file `backend/prisma/database.db` ke tempat aman secara berkala

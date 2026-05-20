@@ -87,8 +87,8 @@ var
   AppDir: String;
   ResultCode: Integer;
   EnvContent: String;
-  NodeExe: String;
-  NpmCmd: String;
+  SetupBat: String;
+  BatContent: String;
 begin
   if CurStep = ssPostInstall then
   begin
@@ -103,14 +103,6 @@ begin
            '', SW_SHOW, ewWaitUntilTerminated, ResultCode);
     end;
 
-    // Tentukan path node/npm (pakai full path agar aman setelah install baru)
-    if FileExists('C:\Program Files\nodejs\npm.cmd') then
-      NpmCmd := '"C:\Program Files\nodejs\npm.cmd"'
-    else if FileExists('C:\Program Files (x86)\nodejs\npm.cmd') then
-      NpmCmd := '"C:\Program Files (x86)\nodejs\npm.cmd"'
-    else
-      NpmCmd := 'npm';  // fallback: pakai PATH
-
     // ===== LANGKAH 2: Buat file .env =====
     EnvContent :=
       'DATABASE_URL="file:./database.db"' + #13#10 +
@@ -118,21 +110,51 @@ begin
       'PORT=3001' + #13#10;
     SaveStringToFile(AppDir + '\backend\.env', EnvContent, False);
 
-    // ===== LANGKAH 3: npm install backend =====
-    WizardForm.StatusLabel.Caption := 'Menginstall dependensi backend (1-3 menit pertama kali)...';
-    RunCmd('"' + NpmCmd + '" install --silent', AppDir + '\backend');
+    // ===== LANGKAH 3: Tulis bat helper setup =====
+    SetupBat := AppDir + '\_setup_install.bat';
+    BatContent :=
+      '@echo off' + #13#10 +
+      'title Setup Posyandu App' + #13#10 +
+      'color 0A' + #13#10 +
+      ':: Tambahkan Node.js ke PATH untuk sesi ini' + #13#10 +
+      'set "PATH=%PATH%;C:\Program Files\nodejs;C:\Program Files (x86)\nodejs"' + #13#10 +
+      '' + #13#10 +
+      'cd /d "' + AppDir + '\backend"' + #13#10 +
+      '' + #13#10 +
+      'echo ======================================' + #13#10 +
+      'echo   SETUP POSYANDU APP' + #13#10 +
+      'echo ======================================' + #13#10 +
+      'echo.' + #13#10 +
+      'echo [1/3] Menginstall dependensi (1-3 menit)...' + #13#10 +
+      'call npm install' + #13#10 +
+      'if errorlevel 1 (' + #13#10 +
+      '  echo.' + #13#10 +
+      '  echo GAGAL: npm install. Tekan tombol apa saja untuk keluar.' + #13#10 +
+      '  pause >nul' + #13#10 +
+      '  exit /b 1' + #13#10 +
+      ')' + #13#10 +
+      '' + #13#10 +
+      'echo [2/3] Menyiapkan database...' + #13#10 +
+      'call npx prisma db push' + #13#10 +
+      '' + #13#10 +
+      'echo [3/3] Membuat akun admin...' + #13#10 +
+      'node src\seed.js' + #13#10 +
+      '' + #13#10 +
+      'echo.' + #13#10 +
+      'echo ======================================' + #13#10 +
+      'echo   Setup selesai!' + #13#10 +
+      'echo   Tekan sembarang tombol untuk lanjut.' + #13#10 +
+      'echo ======================================' + #13#10 +
+      'pause >nul' + #13#10;
 
-    // ===== LANGKAH 4: Prisma db push (buat database) =====
-    WizardForm.StatusLabel.Caption := 'Menyiapkan database...';
-    RunCmd('"' + AppDir + '\backend\node_modules\.bin\prisma.cmd" db push', AppDir + '\backend');
+    SaveStringToFile(SetupBat, BatContent, False);
 
-    // ===== LANGKAH 5: Seed (buat akun admin) =====
-    WizardForm.StatusLabel.Caption := 'Membuat akun admin...';
-    if FileExists('C:\Program Files\nodejs\node.exe') then
-      NodeExe := '"C:\Program Files\nodejs\node.exe"'
-    else
-      NodeExe := 'node';
-    RunCmd(NodeExe + ' src/seed.js', AppDir + '\backend');
+    // ===== LANGKAH 4: Jalankan bat helper =====
+    WizardForm.StatusLabel.Caption := 'Menjalankan setup (lihat jendela yang muncul)...';
+    Exec('cmd.exe', '/c "' + SetupBat + '"', AppDir, SW_SHOW, ewWaitUntilTerminated, ResultCode);
+
+    // Hapus bat helper setelah selesai
+    DeleteFile(SetupBat);
 
     WizardForm.StatusLabel.Caption := 'Selesai!';
   end;
