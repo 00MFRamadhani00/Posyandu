@@ -1,0 +1,125 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  username  String   @unique
+  password  String
+  nama      String
+  role      Role     @default(KADER)
+  aktif     Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Anak {
+  id            Int            @id @default(autoincrement())
+  nik           String?        @unique
+  namaLengkap   String
+  tanggalLahir  DateTime
+  jenisKelamin  JenisKelamin
+  namaOrangtua  String
+  beratLahir    Float?
+  panjangLahir  Float?
+  aktif         Boolean        @default(true)
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  pengukuran    Pengukuran[]
+  imunisasi     Imunisasi[]
+  tindakan      Tindakan[]
+}
+
+model Pengukuran {
+  id             Int      @id @default(autoincrement())
+  anakId         Int
+  bulan          Int
+  tahun          Int
+  tanggal        DateTime
+  beratBadan     Float?
+  tinggiBadan    Float?
+  lingkarLengan  Float?
+  lingkarKepala  Float?
+  ntob           String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  anak           Anak     @relation(fields: [anakId], references: [id])
+
+  @@unique([anakId, bulan, tahun])
+}
+
+model Imunisasi {
+  id             Int           @id @default(autoincrement())
+  anakId         Int
+  jenis          JenisImunisasi
+  tanggal        DateTime?
+  sudahDiberikan Boolean       @default(false)
+  createdAt      DateTime      @default(now())
+  anak           Anak          @relation(fields: [anakId], references: [id])
+
+  @@unique([anakId, jenis])
+}
+
+model Tindakan {
+  id             Int           @id @default(autoincrement())
+  anakId         Int
+  jenis          JenisTindakan
+  tanggal        DateTime
+  createdAt      DateTime      @default(now())
+  anak           Anak          @relation(fields: [anakId], references: [id])
+}
+
+model Kegiatan {
+  id          Int           @id @default(autoincrement())
+  judul       String
+  tanggal     DateTime
+  jam         String?
+  tempat      String?
+  keterangan  String?
+  createdAt   DateTime      @default(now())
+  daftarHadir DaftarHadir[]
+}
+
+model DaftarHadir {
+  id         Int      @id @default(autoincrement())
+  kegiatanId Int
+  nama       String
+  alamat     String?
+  keterangan String?
+  createdAt  DateTime @default(now())
+  kegiatan   Kegiatan @relation(fields: [kegiatanId], references: [id])
+}
+
+enum Role {
+  ADMIN
+  KADER
+}
+
+enum JenisKelamin {
+  L
+  P
+}
+
+enum JenisImunisasi {
+  HB
+  BCG
+  DPT1
+  DPT2
+  DPT3
+  IPV
+  CAMPAK
+  POLIO1
+  POLIO2
+  POLIO3
+  POLIO4
+}
+
+enum JenisTindakan {
+  VITAMIN_A
+  OBAT_CACING
+}
