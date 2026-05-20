@@ -70,9 +70,9 @@ cd backend
 node src/index.js
 ```
 
-Buka browser dan akses: **http://localhost:3001**
+Buka browser dan akses: **URL Yang Anda Set**
 
-> Untuk mode pengembangan (dengan hot reload), jalankan `npm run dev` di folder `backend` dan `frontend` secara terpisah, lalu akses **http://localhost:5173**
+> Untuk mode pengembangan (dengan hot reload), jalankan `npm run dev` di folder `backend` dan `frontend` secara terpisah, lalu akses **URL ANDA**
 
 ---
 
@@ -89,7 +89,7 @@ Buka browser dan akses: **http://localhost:3001**
 
 ### Halaman Publik
 
-Dapat diakses siapa saja tanpa login di **http://localhost:5173**
+Dapat diakses siapa saja tanpa login
 
 - Menampilkan daftar nama anak beserta status pengukuran bulan ini
 - Dapat difilter berdasarkan bulan dan tahun
@@ -103,7 +103,7 @@ Dapat diakses siapa saja tanpa login di **http://localhost:5173**
 
 ### Login
 
-Akses halaman admin melalui tombol **Login Admin** di halaman publik, atau langsung ke **http://localhost:5173/login**
+Akses halaman admin melalui tombol **Login Admin** di halaman publik, atau langsung ke **URL ANDA/login**
 
 - Masukkan username dan password
 - Sesi aktif selama **8 jam**, setelah itu otomatis keluar
