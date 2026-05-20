@@ -51,6 +51,23 @@ router.post('/users', authenticate, requireAdmin, async (req, res) => {
   }
 });
 
+// Update user (admin only) — password opsional, kosong = tidak diubah
+router.put('/users/:id', authenticate, requireAdmin, async (req, res) => {
+  const { nama, username, role, password } = req.body;
+  try {
+    const data = { nama, username, role };
+    if (password) data.password = await bcrypt.hash(password, 10);
+    const user = await prisma.user.update({
+      where: { id: parseInt(req.params.id) },
+      data,
+      select: { id: true, username: true, nama: true, role: true, aktif: true }
+    });
+    res.json(user);
+  } catch (err) {
+    res.status(400).json({ message: 'Username sudah digunakan' });
+  }
+});
+
 // Toggle user aktif (admin only)
 router.patch('/users/:id/toggle', authenticate, requireAdmin, async (req, res) => {
   const user = await prisma.user.update({

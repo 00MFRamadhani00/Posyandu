@@ -6,6 +6,7 @@ export default function UserPage() {
   const { user } = useAuth()
   const [users, setUsers] = useState([])
   const [showForm, setShowForm] = useState(false)
+  const [editTarget, setEditTarget] = useState(null)
   const [form, setForm] = useState({ username: '', password: '', nama: '', role: 'KADER' })
 
   if (user?.role !== 'ADMIN') {
@@ -15,15 +16,30 @@ export default function UserPage() {
   const load = () => api.get('/auth/users').then(r => setUsers(r.data))
   useEffect(() => { load() }, [])
 
+  const openEdit = (u) => {
+    setEditTarget(u)
+    setForm({ nama: u.nama, username: u.username, password: '', role: u.role })
+    setShowForm(true)
+  }
+
+  const closeForm = () => {
+    setShowForm(false)
+    setEditTarget(null)
+    setForm({ username: '', password: '', nama: '', role: 'KADER' })
+  }
+
   const handleSubmit = async e => {
     e.preventDefault()
     try {
-      await api.post('/auth/users', form)
-      setShowForm(false)
-      setForm({ username: '', password: '', nama: '', role: 'KADER' })
+      if (editTarget) {
+        await api.put(`/auth/users/${editTarget.id}`, form)
+      } else {
+        await api.post('/auth/users', form)
+      }
+      closeForm()
       load()
     } catch (err) {
-      alert(err.response?.data?.message || 'Gagal membuat pengguna')
+      alert(err.response?.data?.message || 'Gagal menyimpan pengguna')
     }
   }
 
@@ -36,7 +52,7 @@ export default function UserPage() {
     <div className="p-6">
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-bold text-gray-800">Manajemen Pengguna</h1>
-        <button onClick={() => setShowForm(true)}
+        <button onClick={() => { setEditTarget(null); setShowForm(true) }}
           className="bg-green-700 text-white px-4 py-2 rounded-lg hover:bg-green-800 text-sm font-medium">
           + Tambah Pengguna
         </button>
@@ -68,7 +84,11 @@ export default function UserPage() {
                     {u.aktif ? 'Aktif' : 'Nonaktif'}
                   </span>
                 </td>
-                <td className="px-4 py-3">
+                <td className="px-4 py-3 flex items-center gap-3">
+                  <button onClick={() => openEdit(u)}
+                    className="text-xs text-blue-500 hover:text-blue-700 underline">
+                    Edit
+                  </button>
                   {u.id !== user.id && (
                     <button onClick={() => handleToggle(u.id, u.aktif)}
                       className="text-xs text-gray-500 hover:text-gray-800 underline">
@@ -86,7 +106,7 @@ export default function UserPage() {
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-2xl shadow-xl w-full max-w-sm">
             <div className="p-6">
-              <h2 className="text-lg font-bold mb-4">Tambah Pengguna</h2>
+              <h2 className="text-lg font-bold mb-4">{editTarget ? 'Edit Pengguna' : 'Tambah Pengguna'}</h2>
               <form onSubmit={handleSubmit} className="space-y-3">
                 <div>
                   <label className="text-sm font-medium text-gray-700">Nama Lengkap *</label>
@@ -99,9 +119,18 @@ export default function UserPage() {
                     className="w-full border rounded-lg px-3 py-2 text-sm mt-1" />
                 </div>
                 <div>
-                  <label className="text-sm font-medium text-gray-700">Password *</label>
-                  <input required type="password" value={form.password} onChange={e => setForm({...form, password: e.target.value})}
-                    className="w-full border rounded-lg px-3 py-2 text-sm mt-1" />
+                  <label className="text-sm font-medium text-gray-700">
+                    Password {editTarget && <span className="text-gray-400 font-normal">(kosongkan jika tidak diubah)</span>}
+                    {!editTarget && '*'}
+                  </label>
+                  <input
+                    required={!editTarget}
+                    type="password"
+                    value={form.password}
+                    onChange={e => setForm({...form, password: e.target.value})}
+                    className="w-full border rounded-lg px-3 py-2 text-sm mt-1"
+                    placeholder={editTarget ? '••••••••' : ''}
+                  />
                 </div>
                 <div>
                   <label className="text-sm font-medium text-gray-700">Role</label>
@@ -115,7 +144,7 @@ export default function UserPage() {
                   <button type="submit" className="flex-1 bg-green-700 text-white py-2 rounded-lg text-sm font-medium hover:bg-green-800">
                     Simpan
                   </button>
-                  <button type="button" onClick={() => setShowForm(false)}
+                  <button type="button" onClick={closeForm}
                     className="flex-1 border py-2 rounded-lg text-sm hover:bg-gray-50">
                     Batal
                   </button>
