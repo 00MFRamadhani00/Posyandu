@@ -12,8 +12,13 @@ router.get('/public', async (req, res) => {
   const b = parseInt(bulan) || now.getMonth() + 1;
   const t = parseInt(tahun) || now.getFullYear();
 
+  const refDate = new Date(t, b - 1, 1);
+  refDate.setHours(0, 0, 0, 0);
+  const batasLahir = new Date(refDate);
+  batasLahir.setFullYear(refDate.getFullYear() - 5);
+
   const anak = await prisma.anak.findMany({
-    where: { aktif: true },
+    where: { aktif: true, tanggalLahir: { gte: batasLahir } },
     select: {
       id: true,
       namaLengkap: true,
