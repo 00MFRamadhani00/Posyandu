@@ -3,7 +3,7 @@ generator client {
 }
 
 datasource db {
-  provider = "mysql"
+  provider = "sqlite"
   url      = env("DATABASE_URL")
 }
 
@@ -12,24 +12,24 @@ model User {
   username  String   @unique
   password  String
   nama      String
-  role      Role     @default(KADER)
+  role      String   @default("KADER")
   aktif     Boolean  @default(true)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
 model Anak {
-  id            Int            @id @default(autoincrement())
-  nik           String?        @unique
+  id            Int          @id @default(autoincrement())
+  nik           String?      @unique
   namaLengkap   String
   tanggalLahir  DateTime
-  jenisKelamin  JenisKelamin
+  jenisKelamin  String
   namaOrangtua  String
   beratLahir    Float?
   panjangLahir  Float?
-  aktif         Boolean        @default(true)
-  createdAt     DateTime       @default(now())
-  updatedAt     DateTime       @updatedAt
+  aktif         Boolean      @default(true)
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
   pengukuran    Pengukuran[]
   imunisasi     Imunisasi[]
   tindakan      Tindakan[]
@@ -54,24 +54,24 @@ model Pengukuran {
 }
 
 model Imunisasi {
-  id             Int           @id @default(autoincrement())
+  id             Int      @id @default(autoincrement())
   anakId         Int
-  jenis          JenisImunisasi
+  jenis          String
   tanggal        DateTime?
-  sudahDiberikan Boolean       @default(false)
-  createdAt      DateTime      @default(now())
-  anak           Anak          @relation(fields: [anakId], references: [id])
+  sudahDiberikan Boolean  @default(false)
+  createdAt      DateTime @default(now())
+  anak           Anak     @relation(fields: [anakId], references: [id])
 
   @@unique([anakId, jenis])
 }
 
 model Tindakan {
-  id             Int           @id @default(autoincrement())
-  anakId         Int
-  jenis          JenisTindakan
-  tanggal        DateTime
-  createdAt      DateTime      @default(now())
-  anak           Anak          @relation(fields: [anakId], references: [id])
+  id        Int      @id @default(autoincrement())
+  anakId    Int
+  jenis     String
+  tanggal   DateTime
+  createdAt DateTime @default(now())
+  anak      Anak     @relation(fields: [anakId], references: [id])
 }
 
 model Kegiatan {
@@ -94,33 +94,4 @@ model DaftarHadir {
   hadir      Boolean  @default(true)
   createdAt  DateTime @default(now())
   kegiatan   Kegiatan @relation(fields: [kegiatanId], references: [id])
-}
-
-enum Role {
-  ADMIN
-  KADER
-}
-
-enum JenisKelamin {
-  L
-  P
-}
-
-enum JenisImunisasi {
-  HB
-  BCG
-  DPT1
-  DPT2
-  DPT3
-  IPV
-  CAMPAK
-  POLIO1
-  POLIO2
-  POLIO3
-  POLIO4
-}
-
-enum JenisTindakan {
-  VITAMIN_A
-  OBAT_CACING
 }

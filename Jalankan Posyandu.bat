@@ -9,26 +9,13 @@ echo        POSYANDU APP - MEMULAI
 echo  ====================================
 echo.
 
-REM --- Cek MySQL XAMPP sudah jalan ---
-echo  [1/3] Memeriksa database...
-"C:\xampp\mysql\bin\mysqladmin.exe" -u root status >nul 2>&1
-if %errorlevel% neq 0 (
-    echo        Database belum aktif, menghidupkan...
-    start "" "C:\xampp\mysql\bin\mysqld.exe" --defaults-file="C:\xampp\mysql\bin\my.ini" --standalone
-    timeout /t 4 /nobreak >nul
-    echo        Database siap.
-) else (
-    echo        Database sudah aktif.
-)
-
-echo.
-echo  [2/3] Menjalankan aplikasi...
+echo  [1/2] Menjalankan aplikasi...
 cd backend
 start /min "" cmd /c "node src/index.js > ..\app.log 2>&1"
 timeout /t 2 /nobreak >nul
 
 echo.
-echo  [3/3] Membuka browser...
+echo  [2/2] Membuka browser...
 start "" http://localhost:3001
 echo.
 echo  ====================================

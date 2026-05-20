@@ -29,4 +29,11 @@ app.log
 FITUR.md
 user.txt
 
+# SQLite database file
+backend/database.db
+
+# Inno Setup output & bundled Node.js installer
+Output/
+*.msi
+
 .claude/
