@@ -11,12 +11,13 @@ DefaultDirName={localappdata}\PosyanduApp
 DefaultGroupName={#AppName}
 DisableProgramGroupPage=yes
 OutputBaseFilename=Setup Posyandu
+SetupIconFile=Icon\favicon.ico
 Compression=lzma2
 SolidCompression=yes
 WizardStyle=modern
 PrivilegesRequired=lowest
 UninstallDisplayName={#AppName}
-UninstallDisplayIcon={app}\Jalankan Posyandu.bat
+UninstallDisplayIcon={app}\icon.ico
 
 [Languages]
 Name: "default"; MessagesFile: "compiler:Default.isl"
@@ -36,12 +37,14 @@ Source: "frontend\dist\*"; DestDir: "{app}\frontend\dist"; Flags: recursesubdirs
 
 ; Launcher
 Source: "Jalankan Posyandu.bat"; DestDir: "{app}"
+; Icon
+Source: "Icon\favicon.ico"; DestDir: "{app}"; DestName: "icon.ico"
 
 [Icons]
 ; Shortcut di Desktop
-Name: "{userdesktop}\Posyandu App"; Filename: "{app}\Jalankan Posyandu.bat"; WorkingDir: "{app}"
+Name: "{userdesktop}\Posyandu App"; Filename: "{app}\Jalankan Posyandu.bat"; WorkingDir: "{app}"; IconFilename: "{app}\icon.ico"
 ; Shortcut di Start Menu
-Name: "{userprograms}\{#AppName}\{#AppName}"; Filename: "{app}\Jalankan Posyandu.bat"; WorkingDir: "{app}"
+Name: "{userprograms}\{#AppName}\{#AppName}"; Filename: "{app}\Jalankan Posyandu.bat"; WorkingDir: "{app}"; IconFilename: "{app}\icon.ico"
 Name: "{userprograms}\{#AppName}\Uninstall"; Filename: "{uninstallexe}"
 
 [Code]
